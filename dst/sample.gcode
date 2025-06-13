@@ -1,0 +1,16 @@
+G90 (use absolute coordinates)
+G0 X0 Y0 F1000
+M3 S0
+M3 S3
+G1 X0.1
+M3 S15
+G1 X0.15
+M3 S0
+G0 X26.35 Y0
+M3 S11
+G1 X26.4
+M3 S3
+G1 X26.5
+M3 S0
+M3 S0
+G0 X26.5 Y0.05
