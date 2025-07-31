@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"os"
+	"path/filepath"
 	"slices"
+	"strings"
 
 	"github.com/256dpi/gcode"
 )
@@ -11,7 +13,8 @@ import (
 func main() {
 	var (
 		inputFile  = flag.String("i", "", "Usage: -i=<input_file>")
-		outputFile = flag.String("o", "", "Usage: -o=<output_file>")
+		outputFile = flag.String("of", "", "Usage: -of=<output_file>")
+		outputDir  = flag.String("od", "", "Usage: -od=<output_dir>")
 	)
 
 	flag.Parse()
@@ -59,11 +62,28 @@ func main() {
 	}
 
 	// Запись
-	fw, err := os.Create(*outputFile)
-	if err != nil {
-		panic(err)
+	var fw *os.File
+	if outputFile != nil && *outputFile != "" {
+		fw, err = os.Create(*outputFile)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		_, base, _ := ParseFile(*inputFile)
+		fw, err = os.Create(filepath.Join(*outputDir, base+".gcode"))
+		if err != nil {
+			panic(err)
+		}
 	}
 	defer fw.Close()
 
 	gcode.WriteFile(fw, &gcode.File{Lines: ng})
+}
+
+func ParseFile(file string) (dir string, filename string, ext string) {
+	dir = filepath.Dir(file)
+	base := filepath.Base(file)
+	ext = filepath.Ext(file)
+	filename = strings.TrimSuffix(base, ext)
+	return
 }
